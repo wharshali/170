@@ -100,7 +100,7 @@ def find_cycle(graph):
             spanning_tree[each] = None
             # Explore node's connected component
             dfs(each)
-            if (cycle) and len(cycle) <= 5:
+            if (cycle):
                 setrecursionlimit(recursionlimit)
                 return cycle
 
