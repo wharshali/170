@@ -3,24 +3,6 @@ import os
 import glob
 largeList = []
 files = []
-for i in range(1, 493):
-    s = "phase1processed/" + str(i) + ".in"
-    files.append(s)
-
-for filename in files:
-    f = open(filename, 'r')
-    size = int(f.readline())
-    children = list(map(int, f.readline().split()))
-    matrix = [[0 for elm in range(size)] for elm in range(size)]
-    row = f.readline()
-    i = 0
-    while (row and i < size):
-        r = map(int, row.split())
-        for j in range(size):
-            matrix[j][i] = r[j]
-        row = f.readline()
-        i += 1
-    largeList.append((size, children, matrix))
 
 class Vertex:
     def __init__(self, num, isChild):
@@ -28,6 +10,7 @@ class Vertex:
         self.neighbors = []
         self.child = isChild
         self.num = num
+        self.predeccesors = []
 
     def edges(self):
         return self.edges
@@ -35,12 +18,16 @@ class Vertex:
     def add_edge(self, v):
         self.edges.append(Edge(v, self))
         self.neighbors.append(v)
+        v.predeccesors.append(self)
 
     def neighbors(self):
         return self.neighbors
 
     def isChild(self):
         return self.child
+
+    def __str__(self):
+        return self.num
 
 class Edge:
         def __init__(self, head, tail):
@@ -98,7 +85,7 @@ class Graph:
                     spanning_tree[each] = node
                     dfs(each)
                 else:
-                    if (spanning_tree[node] != each):
+                    if (spanning_tree[node] != each or spanning_tree[node] == vertex):
                         cycle.extend(find_cycle_to_ancestor(node, each))
 
 
@@ -113,33 +100,76 @@ class Graph:
             return cycle
         return []
 
-    #V is a vertex object
-    def get_out_edges(self, v):
-        if (elf.vertices[v] == None):
-            return []
-        return self.vertices[v].edges()
 
 
-    #VERTICES is a list of vertices (indices)
-    def remove_vertices(v):
-        self.vertices[v] = None
+    #V = vertex
+    def remove_vertices(self, v):
+        if v in self.vertices:
+            v.neighbors = None
+            for p in v.predeccesors:
+                if p.neighbors:
+                    p.neighbors.remove(v)
+
+            self.vertices.remove(v)
+
+    def solver(self):
+        final_cycles = []
+        num_nodes = len(self.vertices)
+        counter = 0
+        while counter < num_nodes/5:
+            v = random.choice(self.vertices)
+            cycle = self.find_cycle(v)
+            if cycle == []:
+                counter+=1
+                break
+            final_cycles.append(cycle)
+            for v in cycle:
+                self.remove_vertices(v)
+        return final_cycles
 
 
 def main():
-    adj = [[0 for x in range(5)] for y in range(5)]
-    adj[0][1] = 1
-    adj[2][3] = 1
-    adj[3][4] = 1
-    adj[4][2] = 1
+    # adj = [[0 for x in range(5)] for y in range(5)]
+    # adj[0][1] = 1
+    # adj[1][2] = 1
+    # adj[2][1] = 1
+    # adj[2][3] = 1
+    # adj[3][4] = 1
+    # adj[4][2] = 1
 
-    G = Graph(adj, [])
-    #print gr.nodes()
-    node = random.choice(G.vertices)
-    cycs = G.find_cycle(node)
-    cycle = []
-    for v in cycs:
-        cycle.append(v.num)
-    print "cycle is: ", cycle
+    # G = Graph(adj, [])
+    # cycle_list = []
+    # for c in G.solver():
+    #     l = []
+    #     for v in c:
+    #         l.append(v.num)
+    #     cycle_list.append(l)
+
+
+    # print cycle_list
+    # cycs = G.find_cycle(node)
+    # cycle = []
+    # for v in cycs:
+    #     cycle.append(v.num)
+    # print "cycle is: ", cycle
+    for i in range(1, 493):
+        s = "phase1processed/" + str(i) + ".in"
+        files.append(s)
+
+    for filename in files:
+        f = open(filename, 'r')
+        size = int(f.readline())
+        children = list(map(int, f.readline().split()))
+        matrix = [[0 for elm in range(size)] for elm in range(size)]
+        row = f.readline()
+        i = 0
+        while (row and i < size):
+            r = map(int, row.split())
+            for j in range(size):
+                matrix[j][i] = r[j]
+            row = f.readline()
+            i += 1
+        largeList.append((size, children, matrix))
 
 
 if __name__ == "__main__":
