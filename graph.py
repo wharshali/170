@@ -61,19 +61,42 @@ class Graph:
 
     def find_cycle(self, vertex):
 
-        for neighbour in vertex.getNeighbors():
-            if neighbour not in visited:
-                if neighbour in path:
-                    index = path.index(neighbour)
-                    if (math.abs(index - len(path)) < 5):
-                        return path[index:]
-                else: 
-                    path.append(neighbour)
-                visited.add(neighbour)
-                self.find_cycle(neighbour)
-            path.remove(vertex)
 
-    #V = vertex
+        def find_cycle_to_ancestor(node, ancestor):
+            path = []
+            while (node != ancestor):
+                if (node is None):
+                    return []
+                path.append(node)
+                node = spanning_tree[node]
+            path.append(node)
+            path.reverse()
+            return path
+        
+        def dfs(node):
+            visited[node] = 1
+            # Recursively explore the connected component
+            for each in node.neighbors:
+                if (cycle):
+                    return
+                if (each not in visited):
+                    spanning_tree[each] = node
+                    dfs(each)
+                else:
+                    if (spanning_tree[node] != each):
+                        cycle.extend(find_cycle_to_ancestor(node, each))
+
+        visited = {}              # List for marking visited and non-visited nodes
+        spanning_tree = {}        # Spanning tree
+        cycle = []
+
+        # Select a non-visited node
+        spanning_tree[vertex] = None 
+        dfs(vertex)
+        if (cycle) and len(cycle) <= 5:
+            return cycle
+        return []
+
     def remove_vertices(self, v):
         if v in self.vertices:
             v.neighbors = None
@@ -90,25 +113,16 @@ class Graph:
         while counter < num_nodes/5:
             v = random.choice(self.vertices)
             cycle = self.find_cycle(v)
-            if cycle == []:
+            if cycle == [] or len(cycle) > 5:
                 counter+=1
-                break
-            final_cycles.append(cycle)
-            for v in cycle:
-                self.remove_vertices(v)
+            else:
+                final_cycles.append(cycle)
+                for v in cycle:
+                    self.remove_vertices(v)
         return final_cycles
 
-    def solver_2(self):
-        for vertex in self.vertices:
-            path = [vertex]
-            visited = set()
-            cycle = self.find_cycle(vertex, path, visited)
-            if cycle:
-                return cycle
-        return None
-
 def main():
-    adj = [[0 for x in range(20)] for y in range(20)]
+
     adj[0][1] = 1
     adj[1][2] = 1
     adj[2][1] = 1
@@ -122,11 +136,22 @@ def main():
     adj[9][5] = 1
 
     G = Graph(adj, [])
-    cycle_list = G.solver_2()
-    print "matt cycle is: ", cycle_list
-    for v in cycle_list:
-        print v.num
+    cycle_list = []
+    
+    for c in G.solver():
+        l = []
+        for v in c:
+            l.append(v.num)
+        cycle_list.append(l)
 
+    print cycle_list
+
+    # v = G.vertices[9]
+    # cycs = G.find_cycle(v)
+    # cycle = []
+    # for v in cycs:
+    #     cycle.append(v.num)
+    # print "cycle is: ", cycle
     # for i in range(1, 493):
     #     s = "phase1processed/" + str(i) + ".in"
     #     files.append(s)
@@ -145,6 +170,7 @@ def main():
     #         row = f.readline()
     #         i += 1
     #     largeList.append((size, children, matrix))
+
 
 if __name__ == "__main__":
     main()
