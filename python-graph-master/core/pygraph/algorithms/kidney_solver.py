@@ -6,6 +6,9 @@ from pygraph.classes import digraph
 
 
 
+def remove_highest(cycles):
+	pass
+
 def build_kidney_graph(nodes, edges):
 	"""
 	nodes: List of nodes: [0,1,2,3,4,5]
@@ -18,7 +21,6 @@ def build_kidney_graph(nodes, edges):
 		gr.add_edge(edge)
 
 	return gr
-
 
 
 
