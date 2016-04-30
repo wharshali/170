@@ -62,9 +62,6 @@ class Graph:
     def find_cycle(self, vertex):
 
         def find_cycle_to_ancestor(node, ancestor):
-            """
-            Find a cycle containing both node and ancestor.
-            """
             path = []
             while (node != ancestor):
                 if (node is None):
@@ -77,7 +74,7 @@ class Graph:
         
         def dfs(node):
             visited[node] = 1
-            # Explore recursively the connected component
+            # Recursively explore the connected component
             for each in node.neighbors:
                 if (cycle):
                     return
@@ -85,9 +82,8 @@ class Graph:
                     spanning_tree[each] = node
                     dfs(each)
                 else:
-                    if (spanning_tree[node] != each or spanning_tree[node] == vertex):
+                    if (spanning_tree[node] != each):
                         cycle.extend(find_cycle_to_ancestor(node, each))
-
 
         visited = {}              # List for marking visited and non-visited nodes
         spanning_tree = {}        # Spanning tree
@@ -101,8 +97,6 @@ class Graph:
         return []
 
 
-
-    #V = vertex
     def remove_vertices(self, v):
         if v in self.vertices:
             v.neighbors = None
@@ -119,57 +113,63 @@ class Graph:
         while counter < num_nodes/5:
             v = random.choice(self.vertices)
             cycle = self.find_cycle(v)
-            if cycle == []:
+            if cycle == [] or len(cycle) > 5:
                 counter+=1
-                break
-            final_cycles.append(cycle)
-            for v in cycle:
-                self.remove_vertices(v)
+            else:
+                final_cycles.append(cycle)
+                for v in cycle:
+                    self.remove_vertices(v)
         return final_cycles
 
-
 def main():
-    # adj = [[0 for x in range(5)] for y in range(5)]
-    # adj[0][1] = 1
-    # adj[1][2] = 1
-    # adj[2][1] = 1
-    # adj[2][3] = 1
-    # adj[3][4] = 1
-    # adj[4][2] = 1
+    adj = [[0 for x in range(10)] for y in range(10)]
+    adj[0][1] = 1
+    adj[1][2] = 1
+    adj[2][1] = 1
+    adj[2][3] = 1
+    adj[3][4] = 1
+    adj[4][2] = 1
+    adj[5][6] = 1
+    adj[6][7] = 1
+    adj[7][8] = 1
+    adj[8][9] = 1
+    adj[9][5] = 1
 
-    # G = Graph(adj, [])
-    # cycle_list = []
-    # for c in G.solver():
-    #     l = []
-    #     for v in c:
-    #         l.append(v.num)
-    #     cycle_list.append(l)
+    G = Graph(adj, [])
+    cycle_list = []
+    
+    for c in G.solver():
+        l = []
+        for v in c:
+            l.append(v.num)
+        cycle_list.append(l)
 
+    print cycle_list
 
-    # print cycle_list
-    # cycs = G.find_cycle(node)
+    # v = G.vertices[9]
+    # cycs = G.find_cycle(v)
     # cycle = []
     # for v in cycs:
     #     cycle.append(v.num)
     # print "cycle is: ", cycle
-    for i in range(1, 493):
-        s = "phase1processed/" + str(i) + ".in"
-        files.append(s)
+    # for i in range(1, 493):
+    #     s = "phase1processed/" + str(i) + ".in"
+    #     files.append(s)
 
-    for filename in files:
-        f = open(filename, 'r')
-        size = int(f.readline())
-        children = list(map(int, f.readline().split()))
-        matrix = [[0 for elm in range(size)] for elm in range(size)]
-        row = f.readline()
-        i = 0
-        while (row and i < size):
-            r = map(int, row.split())
-            for j in range(size):
-                matrix[j][i] = r[j]
-            row = f.readline()
-            i += 1
-        largeList.append((size, children, matrix))
+    # for filename in files:
+    #     f = open(filename, 'r')
+    #     size = int(f.readline())
+    #     children = list(map(int, f.readline().split()))
+    #     matrix = [[0 for elm in range(size)] for elm in range(size)]
+    #     row = f.readline()
+    #     i = 0
+    #     while (row and i < size):
+    #         r = map(int, row.split())
+    #         for j in range(size):
+    #             matrix[j][i] = r[j]
+    #         row = f.readline()
+    #         i += 1
+    #     largeList.append((size, children, matrix))
 
 
 if __name__ == "__main__":
