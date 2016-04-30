@@ -1,6 +1,7 @@
 import random
 import os
 import glob
+import math
 largeList = []
 files = []
 
@@ -20,7 +21,7 @@ class Vertex:
         self.neighbors.append(v)
         v.predeccesors.append(self)
 
-    def neighbors(self):
+    def getNeighbors(self):
         return self.neighbors
 
     def isChild(self):
@@ -58,49 +59,19 @@ class Graph:
                 if self.matrix[column][row] == 1:
                     self.vertices[column].add_edge(self.vertices[row])
 
-
     def find_cycle(self, vertex):
 
-        def find_cycle_to_ancestor(node, ancestor):
-            """
-            Find a cycle containing both node and ancestor.
-            """
-            path = []
-            while (node != ancestor):
-                if (node is None):
-                    return []
-                path.append(node)
-                node = spanning_tree[node]
-            path.append(node)
-            path.reverse()
-            return path
-        
-        def dfs(node):
-            visited[node] = 1
-            # Explore recursively the connected component
-            for each in node.neighbors:
-                if (cycle):
-                    return
-                if (each not in visited):
-                    spanning_tree[each] = node
-                    dfs(each)
-                else:
-                    if (spanning_tree[node] != each or spanning_tree[node] == vertex):
-                        cycle.extend(find_cycle_to_ancestor(node, each))
-
-
-        visited = {}              # List for marking visited and non-visited nodes
-        spanning_tree = {}        # Spanning tree
-        cycle = []
-
-        # Select a non-visited node
-        spanning_tree[vertex] = None 
-        dfs(vertex)
-        if (cycle) and len(cycle) <= 5:
-            return cycle
-        return []
-
-
+        for neighbour in vertex.getNeighbors():
+            if neighbour not in visited:
+                if neighbour in path:
+                    index = path.index(neighbour)
+                    if (math.abs(index - len(path)) < 5):
+                        return path[index:]
+                else: 
+                    path.append(neighbour)
+                visited.add(neighbour)
+                self.find_cycle(neighbour)
+            path.remove(vertex)
 
     #V = vertex
     def remove_vertices(self, v):
@@ -127,50 +98,53 @@ class Graph:
                 self.remove_vertices(v)
         return final_cycles
 
+    def solver_2(self):
+        for vertex in self.vertices:
+            path = [vertex]
+            visited = set()
+            cycle = self.find_cycle(vertex, path, visited)
+            if cycle:
+                return cycle
+        return None
 
 def main():
-    # adj = [[0 for x in range(5)] for y in range(5)]
-    # adj[0][1] = 1
-    # adj[1][2] = 1
-    # adj[2][1] = 1
-    # adj[2][3] = 1
-    # adj[3][4] = 1
-    # adj[4][2] = 1
+    adj = [[0 for x in range(20)] for y in range(20)]
+    adj[0][1] = 1
+    adj[1][2] = 1
+    adj[2][1] = 1
+    adj[2][3] = 1
+    adj[3][4] = 1
+    adj[4][2] = 1
+    adj[5][6] = 1
+    adj[6][7] = 1
+    adj[7][8] = 1
+    adj[8][9] = 1
+    adj[9][5] = 1
 
-    # G = Graph(adj, [])
-    # cycle_list = []
-    # for c in G.solver():
-    #     l = []
-    #     for v in c:
-    #         l.append(v.num)
-    #     cycle_list.append(l)
+    G = Graph(adj, [])
+    cycle_list = G.solver_2()
+    print "matt cycle is: ", cycle_list
+    for v in cycle_list:
+        print v.num
 
+    # for i in range(1, 493):
+    #     s = "phase1processed/" + str(i) + ".in"
+    #     files.append(s)
 
-    # print cycle_list
-    # cycs = G.find_cycle(node)
-    # cycle = []
-    # for v in cycs:
-    #     cycle.append(v.num)
-    # print "cycle is: ", cycle
-    for i in range(1, 493):
-        s = "phase1processed/" + str(i) + ".in"
-        files.append(s)
-
-    for filename in files:
-        f = open(filename, 'r')
-        size = int(f.readline())
-        children = list(map(int, f.readline().split()))
-        matrix = [[0 for elm in range(size)] for elm in range(size)]
-        row = f.readline()
-        i = 0
-        while (row and i < size):
-            r = map(int, row.split())
-            for j in range(size):
-                matrix[j][i] = r[j]
-            row = f.readline()
-            i += 1
-        largeList.append((size, children, matrix))
-
+    # for filename in files:
+    #     f = open(filename, 'r')
+    #     size = int(f.readline())
+    #     children = list(map(int, f.readline().split()))
+    #     matrix = [[0 for elm in range(size)] for elm in range(size)]
+    #     row = f.readline()
+    #     i = 0
+    #     while (row and i < size):
+    #         r = map(int, row.split())
+    #         for j in range(size):
+    #             matrix[j][i] = r[j]
+    #         row = f.readline()
+    #         i += 1
+    #     largeList.append((size, children, matrix))
 
 if __name__ == "__main__":
     main()
