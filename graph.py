@@ -183,6 +183,7 @@ def main():
     # # print "cycle is: ", cycle
 
     size, childList, adj = largeList[0]
+    print(adj)
     G = Graph(adj, childList)
     print "#verts in graph pre: ", len(G.vertices)
     print "pre penalty is: ", G.get_penalty()
