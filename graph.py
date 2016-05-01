@@ -135,9 +135,40 @@ def main():
     adj[8][9] = 1
     adj[9][5] = 1
 
-    G = Graph(adj, [])
+    # G = Graph(adj, [])
     cycle_list = []
     
+    
+
+    # v = G.vertices[9]
+    # cycs = G.find_cycle(v)
+    # cycle = []
+    # for v in cycs:
+    #     cycle.append(v.num)
+    # print "cycle is: ", cycle
+
+    for i in range(1, 493):
+        s = "phase1processed/" + str(i) + ".in"
+        files.append(s)
+
+    for filename in files:
+        f = open(filename, 'r')
+        size = int(f.readline())
+        children = list(map(int, f.readline().split()))
+        matrix = [[0 for elm in range(size)] for elm in range(size)]
+        row = f.readline()
+        i = 0
+        while (row and i < size):
+            r = map(int, row.split())
+            for j in range(size):
+                matrix[j][i] = r[j]
+            row = f.readline()
+            i += 1
+        largeList.append((size, children, matrix))
+
+    size, childList, adj = largeList[1]
+    G = Graph(adj, childList)
+
     for c in G.solver():
         l = []
         for v in c:
@@ -146,30 +177,15 @@ def main():
 
     print cycle_list
 
-    # v = G.vertices[9]
-    # cycs = G.find_cycle(v)
-    # cycle = []
-    # for v in cycs:
-    #     cycle.append(v.num)
-    # print "cycle is: ", cycle
-    # for i in range(1, 493):
-    #     s = "phase1processed/" + str(i) + ".in"
-    #     files.append(s)
+    elems = set()
+    total_len = 0
+    for lst in cycle_list:
+        for elem in lst:
+            total_len += 1
+            elems.add(elem)
+    print("total length: " + str(total_len))
+    print("set length: " + str(len(elems)))
 
-    # for filename in files:
-    #     f = open(filename, 'r')
-    #     size = int(f.readline())
-    #     children = list(map(int, f.readline().split()))
-    #     matrix = [[0 for elm in range(size)] for elm in range(size)]
-    #     row = f.readline()
-    #     i = 0
-    #     while (row and i < size):
-    #         r = map(int, row.split())
-    #         for j in range(size):
-    #             matrix[j][i] = r[j]
-    #         row = f.readline()
-    #         i += 1
-    #     largeList.append((size, children, matrix))
 
 
 if __name__ == "__main__":
