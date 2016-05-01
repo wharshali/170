@@ -47,7 +47,7 @@ class Graph:
         self.children = ChildList
         self.matrix = adjacency_matrix
         self.size = len(adjacency_matrix)
-
+        self.penalty = (self.size - len(self.children)) + len(self.children)*2 
         self.vertices = []
         for i in range(self.size):
             f = i in ChildList
@@ -57,6 +57,9 @@ class Graph:
             for row in range(self.size):
                 if self.matrix[column][row] == 1:
                     self.vertices[column].add_edge(self.vertices[row])
+
+    def get_penalty(self):
+        return self.penalty
 
 
     def find_cycle(self, vertex):
@@ -103,8 +106,14 @@ class Graph:
             for p in v.predeccesors:
                 if p.neighbors:
                     p.neighbors.remove(v)
-
+            if v in self.children:
+                self.penalty -= 2
+            else:
+                self.penalty -= 1
             self.vertices.remove(v)
+
+
+
 
     def solver(self):
         final_cycles = []
@@ -122,30 +131,6 @@ class Graph:
         return final_cycles
 
 def main():
-    adj = [[0 for x in range(10)] for y in range(10)]
-    adj[0][1] = 1
-    adj[1][2] = 1
-    adj[2][1] = 1
-    adj[2][3] = 1
-    adj[3][4] = 1
-    adj[4][2] = 1
-    adj[5][6] = 1
-    adj[6][7] = 1
-    adj[7][8] = 1
-    adj[8][9] = 1
-    adj[9][5] = 1
-
-    # G = Graph(adj, [])
-    cycle_list = []
-    
-    
-
-    # v = G.vertices[9]
-    # cycs = G.find_cycle(v)
-    # cycle = []
-    # for v in cycs:
-    #     cycle.append(v.num)
-    # print "cycle is: ", cycle
 
     for i in range(1, 493):
         s = "phase1processed/" + str(i) + ".in"
@@ -166,27 +151,24 @@ def main():
             i += 1
         largeList.append((size, children, matrix))
 
-    size, childList, adj = largeList[1]
+    cycle_list = []
+    size, childList, adj = largeList[0]
     G = Graph(adj, childList)
+    print "#verts in graph pre: ", len(G.vertices)
+    print "pre penalty is: ", G.get_penalty()
 
     for c in G.solver():
         l = []
         for v in c:
             l.append(v.num)
         cycle_list.append(l)
-
     print cycle_list
 
-    elems = set()
-    total_len = 0
-    for lst in cycle_list:
-        for elem in lst:
-            total_len += 1
-            elems.add(elem)
-    print("total length: " + str(total_len))
-    print("set length: " + str(len(elems)))
 
+    print "post verts: ", len(G.vertices)
+    print "penalty is: ", G.get_penalty()
 
 
 if __name__ == "__main__":
+    
     main()
