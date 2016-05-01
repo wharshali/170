@@ -1,6 +1,7 @@
 import random
 import os
 import glob
+import time
 largeList = []
 files = []
 
@@ -47,7 +48,7 @@ class Graph:
         self.children = ChildList
         self.matrix = adjacency_matrix
         self.size = len(adjacency_matrix)
-        self.penalty = (self.size - len(self.children)) + len(self.children)*2 
+        self.penalty = self.size + len(self.children)
         self.vertices = []
         for i in range(self.size):
             f = i in ChildList
@@ -106,13 +107,11 @@ class Graph:
             for p in v.predeccesors:
                 if p.neighbors:
                     p.neighbors.remove(v)
-            if v in self.children:
+            if v.num in self.children:
                 self.penalty -= 2
             else:
                 self.penalty -= 1
             self.vertices.remove(v)
-
-
 
 
     def solver(self):
@@ -120,14 +119,17 @@ class Graph:
         num_nodes = len(self.vertices)
         counter = 0
         while counter < num_nodes/5:
-            v = random.choice(self.vertices)
-            cycle = self.find_cycle(v)
-            if cycle == [] or len(cycle) > 5:
-                counter+=1
+            if not self.vertices == []:
+                v = random.choice(self.vertices)
+                cycle = self.find_cycle(v)
+                if cycle == [] or len(cycle) > 5:
+                    counter+=1
+                else:
+                    final_cycles.append(cycle)
+                    for v in cycle:
+                        self.remove_vertices(v)
             else:
-                final_cycles.append(cycle)
-                for v in cycle:
-                    self.remove_vertices(v)
+                break
         return final_cycles
 
 def main():
@@ -151,22 +153,30 @@ def main():
             i += 1
         largeList.append((size, children, matrix))
 
-    cycle_list = []
-    size, childList, adj = largeList[0]
-    G = Graph(adj, childList)
-    print "#verts in graph pre: ", len(G.vertices)
-    print "pre penalty is: ", G.get_penalty()
 
-    for c in G.solver():
-        l = []
-        for v in c:
-            l.append(v.num)
-        cycle_list.append(l)
-    print cycle_list
-
-
-    print "post verts: ", len(G.vertices)
-    print "penalty is: ", G.get_penalty()
+    with open("solutions.out", 'w+') as f:
+        for size, childList, adj in largeList:
+            graphCycles = []
+            for i in range(5):
+                G = Graph(adj, childList)
+                cycle_list = []
+                cycles = G.solver()
+                for c in cycles:
+                    l = []
+                    for v in c:
+                        l.append(v.num)
+                    cycle_list.append(l)
+                graphCycles.append((cycle_list, G.get_penalty()))
+            bestCycles = min(graphCycles, key=lambda x : x[1])[0]
+            if bestCycles == []:
+                f.write("None\n")
+            else:
+                for i, cycle in enumerate(bestCycles):
+                    if i == len(bestCycles) - 1:
+                        f.write(" ".join(str(x) for x in cycle))
+                    else:
+                        f.write(" ".join(str(x) for x in cycle) + "; ")
+                f.write("\n")
 
 
 if __name__ == "__main__":
