@@ -3,9 +3,60 @@ import os
 import glob
 import unittest
 import time
+import pdb
 
 largeList = []
 files = []
+
+"""returns the data from *.in files as a list of adjacency matricies"""
+def fetchData():
+    for i in range(1, 493):
+        s = "phase1processed/" + str(i) + ".in"
+        files.append(s)
+    for filename in files:
+        f = open(filename, 'r')
+        size = int(f.readline())
+        children = list(map(int, f.readline().split()))
+        matrix = [[0 for elm in range(size)] for elm in range(size)]
+        row = f.readline()
+        i = 0
+        while (row and i < size):
+            r = map(int, row.split())
+            for j in range(size):
+                if (r[j] == 1):
+                    matrix[j][i] = 1
+            row = f.readline()
+            i += 1
+        largeList.append((size, children, matrix))
+
+"""Same as above but used for testing"""
+def fetchDataTesting():
+    f = open("testinput/test1.in", 'r')
+    size = int(f.readline())
+    children = list(map(int, f.readline().split()))
+    matrix = [[0 for elm in range(size)] for elm in range(size)]
+    row = f.readline()
+    i = 0
+    while (row and i < size):
+        r = map(int, row.split())
+        for j in range(size):
+            if (r[j] == 1):
+                matrix[j][i] = 1
+        row = f.readline()
+        i += 1
+    return (size, children, matrix)
+
+"""Input: One valid list of the cycles and the Graph that the list belongs to."""
+def validateCycles(G, cycleList):
+    error_edges = []
+    matrix = G.get_Matrix()
+    for cycle in cycleList:
+        for i in range(len(cycle)-1):
+            if not (matrix[cycle[i]][cycle[i+1]]):
+                error_edges.append((cycle[i],cycle[i+1]))
+        if not (matrix[cycle[-1]][cycle[0]]):
+            error_edges.append((cycle[-1],cycle[0]))
+    return error_edges
 
 class Vertex:
     def __init__(self, num, isChild):
@@ -64,6 +115,13 @@ class Graph:
     def get_penalty(self):
         return self.penalty
 
+    def get_Matrix(self):
+        return self.matrix
+
+    def getProbDist(self):
+        buckets = self.size + len(children)
+
+
     def find_cycle(self, vertex):
 
 
@@ -114,7 +172,6 @@ class Graph:
                 self.penalty -= 1
             self.vertices.remove(v)
 
-
     def solver(self):
         final_cycles = []
         num_nodes = len(self.vertices)
@@ -157,45 +214,37 @@ class GraphUnitTests(unittest.TestCase):
         bestCycles = min(graphCycles, key=lambda x : x[1])[0]
         print(bestCycles)
 
-
-    
-
+    def test_fetchData(self):
+        size, children, matrix = fetchDataTesting()
+        self.assertEquals(size, 12)
+        self.assertEquals(children, [1,2,5])
+        self.assertEquals(matrix[1][0], 1)
+        self.assertEquals(matrix[0][3], 1)
+        self.assertEquals(matrix[3][6], 1)
 
 def main():
-
-    for i in range(1, 493):
-        s = "phase1processed/" + str(i) + ".in"
-        files.append(s)
-
-    for filename in files:
-        f = open(filename, 'r')
-        size = int(f.readline())
-        children = list(map(int, f.readline().split()))
-        matrix = [[0 for elm in range(size)] for elm in range(size)]
-        row = f.readline()
-        i = 0
-        while (row and i < size):
-            r = map(int, row.split())
-            for j in range(size):
-                matrix[j][i] = r[j]
-            row = f.readline()
-            i += 1
-        largeList.append((size, children, matrix))
-
+    """Getting input Data"""
+    fetchData()
+    
+    """Solving for cycles and selecting the lowest penatly"""
     with open("solutions.out", 'w+') as f:
         for size, childList, adj in largeList:
             graphCycles = []
             for i in range(5):
                 G = Graph(adj, childList)
-                cycle_list = []
                 cycles = G.solver()
-                for c in cycles:
-                    l = []
-                    for v in c:
-                        l.append(v.num)
-                    cycle_list.append(l)
+                cycle_list = [[vertex.num for vertex in cycle]  for cycle in cycles]
                 graphCycles.append((cycle_list, G.get_penalty()))
             bestCycles = min(graphCycles, key=lambda x : x[1])[0]
+            
+            """Validating found Cycles"""
+            for cycles in graphCycles:
+                errors = validateCycles(G, cycles[0])
+                if (errors != []):
+                    print([elm for elm in errors])
+                    print(G.get_Matrix())
+
+            """Writing to file"""
             if bestCycles == []:
                 f.write("None\n")
             else:
@@ -208,4 +257,5 @@ def main():
 
 
 if __name__ == "__main__":
+    #unittest.main()
     main()
