@@ -79,7 +79,10 @@ class Graph:
         def dfs(node):
             visited[node] = 1
             # Recursively explore the connected component
-            for each in node.neighbors:
+            neighbors_copy = node.neighbors.copy()
+            while neighbors_copy:
+                each = random.choice(neighbors_copy)
+            # for each in node.neighbors:
                 if (cycle):
                     return
                 if (each not in visited):
@@ -88,6 +91,7 @@ class Graph:
                 else:
                     if (spanning_tree[node] != each):
                         cycle.extend(find_cycle_to_ancestor(node, each))
+                neighbors_copy.remove(each)
 
         visited = {}              # List for marking visited and non-visited nodes
         spanning_tree = {}        # Spanning tree
@@ -118,18 +122,42 @@ class Graph:
         final_cycles = []
         num_nodes = len(self.vertices)
         counter = 0
+        
         while counter < num_nodes/5:
+
             if not self.vertices == []:
+                max_cost = -float('inf')
+                max_cycle = []
                 v = random.choice(self.vertices)
                 cycle = self.find_cycle(v)
-                if cycle == [] or len(cycle) > 5:
-                    counter+=1
+                while cycle != []:
+                    if len(cycle) > 5:
+                        counter+=1
+                        cycle = self.find_cycle(v)
+                        continue
+                    else:
+                        cycle_cost = 0
+                        for vert in cycle:
+                            if vert.num in self.children:
+                                cycle_cost += 2
+                            else:
+                                cycle_cost += 1
+                        #
+                        if cycle_cost > max_cost:
+                            max_cycle = cycle
+                            max_cost = cycle_cost
+                    
+                    cycle = self.find_cycle(v)
+                
+                if max_cost == -float('inf'):
+                    counter += 1
                 else:
-                    final_cycles.append(cycle)
-                    for v in cycle:
+                    for vertex in max_cycle:
                         self.remove_vertices(v)
+                    final_cycles.append(cycle)
             else:
-                break
+                b reak
+
         return final_cycles
 
 def main():
