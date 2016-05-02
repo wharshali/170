@@ -119,10 +119,10 @@ class Graph:
     def get_Matrix(self):
         return self.matrix
 
-    def getProbDist(self):
-        buckets = len(self.vertices) + 
-        rand = random.random(0, buckets)
-        if rand < self.size - len(children)
+    # def getProbDist(self):
+    #     buckets = len(self.vertices) + 
+    #     rand = random.random(0, buckets)
+    #     if rand < self.size - len(children)
 
     def find_cycle(self, vertex):
 
@@ -197,13 +197,18 @@ class Graph:
 class GraphUnitTests(unittest.TestCase):
     def test_DiffCycles(self):
         a = [[0 for x in range(7)] for y in range(7)]
-        a[0] = [0,1,0,0,0,0,1]
-        a[1] = [1,0,0,1,0,0,0]
-        a[2] = [0,0,0,1,0,0,0]
-        a[3] = [0,1,0,0,1,0,0]
-        a[4] = [1,0,0,0,0,0,0]
-        a[5] = [1,0,0,0,0,0,0]
-        a[6] = [0,0,0,0,1,1,0]
+        a[1][0] = 1
+        a[6][0] = 1
+        a[0][1] = 1
+        a[3][1] = 1
+        a[3][2] = 1
+        a[1][3] = 1
+        a[4][3] = 1
+        a[0][4] = 1
+        a[0][5] = 1
+        a[5][6] = 1
+        a[4][6] = 1
+        
         graphCycles = []
         for i in range(5):
             G = Graph(a, [])
@@ -218,13 +223,14 @@ class GraphUnitTests(unittest.TestCase):
         bestCycles = min(graphCycles, key=lambda x : x[1])[0]
         print(bestCycles)
 
+
     def test_fetchData(self):
         size, children, matrix = fetchDataTesting()
         self.assertEquals(size, 12)
         self.assertEquals(children, [1,2,5])
-        self.assertEquals(matrix[1][0], 1)
-        self.assertEquals(matrix[0][3], 1)
-        self.assertEquals(matrix[3][6], 1)
+        self.assertEquals(matrix[0][1], 1)
+        self.assertEquals(matrix[3][0], 1)
+        self.assertEquals(matrix[6][3], 1)
 
 def main():
     """Getting input Data"""
@@ -261,5 +267,5 @@ def main():
 
 
 if __name__ == "__main__":
-    #unittest.main()
-    main()
+    unittest.main()
+    # main()
