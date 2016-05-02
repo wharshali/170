@@ -99,6 +99,7 @@ class Graph:
     #MATRIX IS READ FROM FILE AS A 2D ARRAY
     def __init__(self, adjacency_matrix, ChildList):
         self.children = ChildList
+        self.remaining_children = ChildList
         self.matrix = adjacency_matrix
         self.size = len(adjacency_matrix)
         self.penalty = self.size + len(self.children)
@@ -165,6 +166,8 @@ class Graph:
         return []
 
     def remove_vertices(self, v):
+        if v in self.children:
+            self.remaining_children.remove(v)
         if v in self.vertices:
             v.neighbors = None
             for p in v.predeccesors:
