@@ -118,10 +118,13 @@ class Graph:
     def get_Matrix(self):
         return self.matrix
 
-    def getProbDist(self):
-        buckets = len(self.vertices) + 
+    def getRandNode(self):
+        buckets = len(self.vertices) + #len(updating children)
         rand = random.random(0, buckets)
-        if rand < self.size - len(children)
+        if rand < self.size - #len(updating children): 
+            select adult
+        else:
+            select child
 
     def find_cycle(self, vertex):
 
