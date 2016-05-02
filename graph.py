@@ -120,15 +120,12 @@ class Graph:
         return self.matrix
 
     def getRandNode(self):
-        buckets = len(self.vertices) + #len(updating children)
-        rand = random.random(0, buckets)
-        if rand < self.size - #len(updating children): 
-            select adult
-        else:
-            select child
+        select_lst = self.vertices + self.remaining_children
+        if len(select_lst) > 0:
+            return random.choice(select_lst)
+        return None
 
     def find_cycle(self, vertex):
-
 
         def find_cycle_to_ancestor(node, ancestor):
             path = []
@@ -179,6 +176,24 @@ class Graph:
                 self.penalty -= 1
             self.vertices.remove(v)
 
+    def solverRand(self):
+        final_cycles = []
+        num_nodes = len(self.vertices)
+        counter = 0
+        while counter < num_nodes/5:
+            if not self.vertices == []:
+                v = self.getRandNode()
+                cycle = self.find_cycle(v)
+                if cycle == [] or len(cycle) > 5:
+                    counter+=1
+                else:
+                    final_cycles.append(cycle)
+                    for v in cycle:
+                        self.remove_vertices(v)
+            else:
+                break
+        return final_cycles
+
     def solver(self):
         final_cycles = []
         num_nodes = len(self.vertices)
@@ -197,21 +212,22 @@ class Graph:
                 break
         return final_cycles
 
+
 class GraphUnitTests(unittest.TestCase):
     def test_DiffCycles(self):
         a = [[0 for x in range(7)] for y in range(7)]
-        a[0] = [0,1,0,0,0,0,1]
+        a[0] = [0,1,0,0,1,1,0]
         a[1] = [1,0,0,1,0,0,0]
-        a[2] = [0,0,0,1,0,0,0]
-        a[3] = [0,1,0,0,1,0,0]
-        a[4] = [1,0,0,0,0,0,0]
-        a[5] = [1,0,0,0,0,0,0]
-        a[6] = [0,0,0,0,1,1,0]
+        a[2] = [0,0,0,0,0,0,0]
+        a[3] = [0,1,1,0,0,0,0]
+        a[4] = [0,0,0,1,0,0,1]
+        a[5] = [0,0,0,0,0,0,1]
+        a[6] = [1,0,0,0,0,0,0]
         graphCycles = []
         for i in range(5):
             G = Graph(a, [])
             cycle_list = []
-            cycles = G.solver()
+            cycles = G.solverRand()
             for c in cycles:
                 l = []
                 for v in c:
@@ -219,15 +235,9 @@ class GraphUnitTests(unittest.TestCase):
                 cycle_list.append(l)
             graphCycles.append((cycle_list, G.get_penalty()))
         bestCycles = min(graphCycles, key=lambda x : x[1])[0]
-        print(bestCycles)
+        checkSet = validateCycles(G, bestCycles)
+        self.assertEquals(len(checkSet), 0)
 
-    def test_fetchData(self):
-        size, children, matrix = fetchDataTesting()
-        self.assertEquals(size, 12)
-        self.assertEquals(children, [1,2,5])
-        self.assertEquals(matrix[1][0], 1)
-        self.assertEquals(matrix[0][3], 1)
-        self.assertEquals(matrix[3][6], 1)
 
 def main():
     """Getting input Data"""
@@ -237,11 +247,18 @@ def main():
     with open("solutions.out", 'w+') as f:
         for size, childList, adj in largeList:
             graphCycles = []
+            """Run 5 times picking random vertex"""
             for i in range(5):
                 G = Graph(adj, childList)
                 cycles = G.solver()
                 cycle_list = [[vertex.num for vertex in cycle]  for cycle in cycles]
                 graphCycles.append((cycle_list, G.get_penalty()))
+            """Run five times with wighted random choice"""
+            G = Graph(adj, childList)
+            cycles = G.solverRand()
+            cycle_list = [[vertex.num for vertex in cycle]  for cycle in cycles]
+            graphCycles.append((cycle_list, G.get_penalty()))
+            
             bestCycles = min(graphCycles, key=lambda x : x[1])[0]
             
             """Validating found Cycles"""
