@@ -212,7 +212,6 @@ class Graph:
                 break
         return final_cycles
 
-
 class GraphUnitTests(unittest.TestCase):
     def test_DiffCycles(self):
         a = [[0 for x in range(7)] for y in range(7)]
@@ -227,7 +226,6 @@ class GraphUnitTests(unittest.TestCase):
         a[0][5] = 1
         a[5][6] = 1
         a[4][6] = 1
-        
         graphCycles = []
         for i in range(5):
             G = Graph(a, [])
@@ -242,15 +240,6 @@ class GraphUnitTests(unittest.TestCase):
         bestCycles = min(graphCycles, key=lambda x : x[1])[0]
         checkSet = validateCycles(G, bestCycles)
         self.assertEquals(len(checkSet), 0)
-
-
-    def test_fetchData(self):
-        size, children, matrix = fetchDataTesting()
-        self.assertEquals(size, 12)
-        self.assertEquals(children, [1,2,5])
-        self.assertEquals(matrix[0][1], 1)
-        self.assertEquals(matrix[3][0], 1)
-        self.assertEquals(matrix[6][3], 1)
 
 def main():
     """Getting input Data"""
@@ -294,5 +283,5 @@ def main():
 
 
 if __name__ == "__main__":
-    unittest.main()
-    # main()
+    #unittest.main()
+    main()
