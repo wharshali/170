@@ -99,7 +99,7 @@ class Graph:
     #MATRIX IS READ FROM FILE AS A 2D ARRAY
     def __init__(self, adjacency_matrix, ChildList):
         self.children = ChildList
-        self.remaining_children = ChildList
+        self.remaining_children = []
         self.matrix = adjacency_matrix
         self.size = len(adjacency_matrix)
         self.penalty = self.size + len(self.children)
@@ -107,6 +107,8 @@ class Graph:
         for i in range(self.size):
             f = i in ChildList
             self.vertices.append(Vertex(i, f))
+            if f:
+                self.remaining_children.append(Vertex(i,f))
 
         for column in range(self.size):
             for row in range(self.size):
@@ -142,14 +144,15 @@ class Graph:
             visited[node] = 1
             # Recursively explore the connected component
             for neighbour in node.neighbors:
+                if (cycle):
+                    return
                 if (neighbour not in visited):
                     spanning_tree[neighbour] = node
                     dfs(neighbour)
                 else:
                     if (spanning_tree[node] != neighbour):
                         cycle.extend(find_cycle_to_ancestor(node, neighbour))
-                        if (cycle):
-                            return
+                        
 
         visited = {}              # List for marking visited and non-visited nodes
         spanning_tree = {}        # Spanning tree
@@ -212,6 +215,9 @@ class Graph:
                 break
         return final_cycles
 
+
+    def 
+
 class GraphUnitTests(unittest.TestCase):
     def test_DiffCycles(self):
         a = [[0 for x in range(7)] for y in range(7)]
@@ -249,19 +255,23 @@ def main():
     with open("solutions.out", 'w+') as f:
         for size, childList, adj in largeList:
             graphCycles = []
+
             """Run 5 times picking random vertex"""
             for i in range(5):
                 G = Graph(adj, childList)
                 cycles = G.solver()
-                cycle_list = [[vertex.num for vertex in cycle]  for cycle in cycles]
+                cycle_list = [[vertex.num for vertex in cycle] for cycle in cycles]
                 graphCycles.append((cycle_list, G.get_penalty()))
-            """Run five times with wighted random choice"""
-            G = Graph(adj, childList)
-            cycles = G.solverRand()
-            cycle_list = [[vertex.num for vertex in cycle]  for cycle in cycles]
-            graphCycles.append((cycle_list, G.get_penalty()))
-            
+
+            """Run 5 times with weighted random choice"""
+            for i in range(5):
+                G = Graph(adj, childList)
+                cycles = G.solverRand()
+                cycle_list = [[vertex.num for vertex in cycle] for cycle in cycles]
+                graphCycles.append((cycle_list, G.get_penalty()))
+                
             bestCycles = min(graphCycles, key=lambda x : x[1])[0]
+            print([elm[1] for elm in graphCycles])
             
             """Validating found Cycles"""
             for cycles in graphCycles:
