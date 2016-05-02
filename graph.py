@@ -1,7 +1,9 @@
 import random
 import os
 import glob
-import math
+import unittest
+import time
+
 largeList = []
 files = []
 
@@ -48,7 +50,7 @@ class Graph:
         self.children = ChildList
         self.matrix = adjacency_matrix
         self.size = len(adjacency_matrix)
-        self.penalty = (self.size - len(self.children)) + len(self.children)*2 
+        self.penalty = self.size + len(self.children)
         self.vertices = []
         for i in range(self.size):
             f = i in ChildList
@@ -106,13 +108,11 @@ class Graph:
             for p in v.predeccesors:
                 if p.neighbors:
                     p.neighbors.remove(v)
-            if v in self.children:
+            if v.num in self.children:
                 self.penalty -= 2
             else:
                 self.penalty -= 1
             self.vertices.remove(v)
-
-
 
 
     def solver(self):
@@ -120,15 +120,46 @@ class Graph:
         num_nodes = len(self.vertices)
         counter = 0
         while counter < num_nodes/5:
-            v = random.choice(self.vertices)
-            cycle = self.find_cycle(v)
-            if cycle == [] or len(cycle) > 5:
-                counter+=1
+            if not self.vertices == []:
+                v = random.choice(self.vertices)
+                cycle = self.find_cycle(v)
+                if cycle == [] or len(cycle) > 5:
+                    counter+=1
+                else:
+                    final_cycles.append(cycle)
+                    for v in cycle:
+                        self.remove_vertices(v)
             else:
-                final_cycles.append(cycle)
-                for v in cycle:
-                    self.remove_vertices(v)
+                break
         return final_cycles
+
+class GraphUnitTests(unittest.TestCase):
+    def test_DiffCycles(self):
+        a = [[0 for x in range(7)] for y in range(7)]
+        a[0] = [0,0,0,0,0,0,1]
+        a[1] = [1,0,0,1,0,0,0]
+        a[2] = [0,0,0,1,0,0,0]
+        a[3] = [0,1,0,0,1,0,0]
+        a[4] = [1,0,0,0,0,0,0]
+        a[5] = [1,0,0,0,0,0,0]
+        a[6] = [0,0,0,0,1,1,0]
+        graphCycles = []
+        for i in range(5):
+            G = Graph(a, [])
+            cycle_list = []
+            cycles = G.solver()
+            for c in cycles:
+                l = []
+                for v in c:
+                    l.append(v.num)
+                cycle_list.append(l)
+            graphCycles.append((cycle_list, G.get_penalty()))
+        bestCycles = min(graphCycles, key=lambda x : x[1])[0]
+        print(bestCycles)
+
+
+    
+
 
 def main():
 
@@ -151,59 +182,30 @@ def main():
             i += 1
         largeList.append((size, children, matrix))
 
-    # adj = [[0 for x in range(10)] for y in range(10)]
-    # adj[0][1] = 1
-    # adj[1][2] = 1
-    # adj[2][1] = 1
-    # adj[2][3] = 1
-    # adj[3][4] = 1
-    # adj[4][2] = 1
-    # adj[5][6] = 1
-    # adj[6][7] = 1
-    # adj[7][8] = 1
-    # adj[8][9] = 1
-    # adj[9][5] = 1
-
-    # G = Graph(adj, [])
-    cycle_list = []
-    
-    # for c in G.solver():
-    #     l = []
-    #     for v in c:
-    #         l.append(v.num)
-    #     cycle_list.append(l)
-
-    # print cycle_list
-
-    # # v = G.vertices[9]
-    # # cycs = G.find_cycle(v)
-    # # cycle = []
-    # # for v in cycs:
-    # #     cycle.append(v.num)
-    # # print "cycle is: ", cycle
-
-    size, childList, adj = largeList[0]
-    print(adj)
-    G = Graph(adj, childList)
-    print "#verts in graph pre: ", len(G.vertices)
-    print "pre penalty is: ", G.get_penalty()
-
-    for c in G.solver():
-        l = []
-        for v in c:
-            l.append(v.num)
-        cycle_list.append(l)
-
-    # print cycle_list
-    elems = set()
-    total_len = 0
-    for lst in cycle_list:
-        total_len += len(lst)
-
-    print "post verts: ", len(G.vertices)
-    print "penalty is: ", G.get_penalty()
+    with open("solutions.out", 'w+') as f:
+        for size, childList, adj in largeList:
+            graphCycles = []
+            for i in range(5):
+                G = Graph(adj, childList)
+                cycle_list = []
+                cycles = G.solver()
+                for c in cycles:
+                    l = []
+                    for v in c:
+                        l.append(v.num)
+                    cycle_list.append(l)
+                graphCycles.append((cycle_list, G.get_penalty()))
+            bestCycles = min(graphCycles, key=lambda x : x[1])[0]
+            if bestCycles == []:
+                f.write("None\n")
+            else:
+                for i, cycle in enumerate(bestCycles):
+                    if i == len(bestCycles) - 1:
+                        f.write(" ".join(str(x) for x in cycle))
+                    else:
+                        f.write(" ".join(str(x) for x in cycle) + "; ")
+                f.write("\n")
 
 
 if __name__ == "__main__":
-    
-    main()
+    unittest.main()
