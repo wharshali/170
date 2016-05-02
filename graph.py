@@ -194,21 +194,7 @@ class Graph:
                 break
         return final_cycles
 
-class GraphUnitTests(unittest.TestCase):
-    def test_DiffCycles(self):
-        a = [[0 for x in range(7)] for y in range(7)]
-        a[1][0] = 1
-        a[6][0] = 1
-        a[0][1] = 1
-        a[3][1] = 1
-        a[3][2] = 1
-        a[1][3] = 1
-        a[4][3] = 1
-        a[0][4] = 1
-        a[0][5] = 1
-        a[5][6] = 1
-        a[4][6] = 1
-        
+         
         graphCycles = []
         for i in range(5):
             G = Graph(a, [])
@@ -267,5 +253,5 @@ def main():
 
 
 if __name__ == "__main__":
-    unittest.main()
-    # main()
+    # unittest.main()
+    main()
