@@ -24,7 +24,7 @@ def fetchData():
             r = map(int, row.split())
             for j in range(size):
                 if (r[j] == 1):
-                    matrix[j][i] = 1
+                    matrix[i][j] = 1
             row = f.readline()
             i += 1
         largeList.append((size, children, matrix))
@@ -41,7 +41,7 @@ def fetchDataTesting():
         r = map(int, row.split())
         for j in range(size):
             if (r[j] == 1):
-                matrix[j][i] = 1
+                matrix[i][j] = 1
         row = f.readline()
         i += 1
     return (size, children, matrix)
@@ -119,8 +119,9 @@ class Graph:
         return self.matrix
 
     def getProbDist(self):
-        buckets = self.size + len(children)
-
+        buckets = len(self.vertices) + 
+        rand = random.random(0, buckets)
+        if rand < self.size - len(children)
 
     def find_cycle(self, vertex):
 
@@ -139,15 +140,15 @@ class Graph:
         def dfs(node):
             visited[node] = 1
             # Recursively explore the connected component
-            for each in node.neighbors:
-                if (cycle):
-                    return
-                if (each not in visited):
-                    spanning_tree[each] = node
-                    dfs(each)
+            for neighbour in node.neighbors:
+                if (neighbour not in visited):
+                    spanning_tree[neighbour] = node
+                    dfs(neighbour)
                 else:
-                    if (spanning_tree[node] != each):
-                        cycle.extend(find_cycle_to_ancestor(node, each))
+                    if (spanning_tree[node] != neighbour):
+                        cycle.extend(find_cycle_to_ancestor(node, neighbour))
+                        if (cycle):
+                            return
 
         visited = {}              # List for marking visited and non-visited nodes
         spanning_tree = {}        # Spanning tree
